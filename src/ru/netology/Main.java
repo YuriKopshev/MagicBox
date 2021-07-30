@@ -1,31 +1,53 @@
 package ru.netology;
 
-public class Main {
+import com.sun.security.jgss.GSSUtil;
 
+public class Main {
+    public static volatile boolean button;
+    private final int pause = 2000;
+    Runnable player = new Runnable() {
+        @Override
+        public void run() {
+            System.out.println("Пользватель включил кнопку!");
+            button = false;
+            try {
+                Thread.sleep(pause);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    Runnable toy = () -> System.out.println("Игрушка отключила кнопку!");
+
+
+    public void game() {
+        int iterationCount = 5;
+        for (int i = 0; i < iterationCount; i++) {
+            new Thread(player).start();
+            try {
+                Thread.sleep(pause);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (!button) {
+               new Thread(toy).start();
+                button = true;
+            }
+            try {
+                Thread.sleep(pause);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Игрушка: хватит меня мучить и нажимать эту кнопку!!!");
+
+
+    }
 
     public static void main(String[] args) {
-        int iterationCount = 15000;
-        BoxAction action = new BoxAction();
-        Thread thread1 = new Thread(null, action::on, "Пользователь");
-        Thread thread2 = new Thread(null, action::off, "Игрушка");
+        new Main().game();
 
-        try {
-            thread1.start();
-            thread2.join();
-            thread2.start();
-
-        } catch (InterruptedException exception) {
-            exception.printStackTrace();
-        }
-        try {
-            Thread.sleep(iterationCount);
-            thread1.interrupt();
-            if (thread1.isInterrupted()) {
-                thread2.interrupt();
-            }
-        } catch (InterruptedException exception) {
-            exception.printStackTrace();
-        }
     }
 }
 
