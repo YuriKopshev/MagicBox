@@ -6,22 +6,39 @@ public class Main {
     public static volatile boolean button;
     private static final int PAUSE = 2000;
     private static final int ITERATIONS = 5;
-    Runnable player = new Runnable() {
+    private static final Runnable player = new Runnable() {
         @Override
         public void run() {
-            System.out.println("Пользватель включил кнопку!");
-            button = false;
-            try {
-                Thread.sleep(PAUSE);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            for (int i = 0; i < ITERATIONS; i++) {
+                System.out.println("Пользователь включил кнопку!");
+                button = false;
+                try {
+                    Thread.sleep(PAUSE);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
 
-    Runnable toy = () -> System.out.println("Игрушка отключила кнопку!");
+    private static final Runnable toy = new Runnable() {
+        @Override
+        public void run() {
+            for (int i = 0; i < ITERATIONS; i++) {
+                System.out.println("Игрушка отключила кнопку!");
+                button = true;
+                try {
+                    Thread.sleep(PAUSE);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
-    public void game() {
+        }
+    };
+
+
+    public static void game() {
         new Thread(player).start();
         try {
             Thread.sleep(PAUSE);
@@ -30,7 +47,7 @@ public class Main {
         }
         if (!button) {
             new Thread(toy).start();
-            button = true;
+
         }
         try {
             Thread.sleep(PAUSE);
@@ -40,10 +57,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        for (int i = 0; i < ITERATIONS; i++) {
-            new Main().game();
-        }
-        System.out.println("Игрушка: хватит меня мучить и нажимать эту кнопку!!!");
+        Main.game();
     }
 }
 
